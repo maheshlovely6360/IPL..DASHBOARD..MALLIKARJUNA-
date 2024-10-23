@@ -1,14 +1,17 @@
 // Write your code here
 import {Component} from 'react'
+
 import Loader from 'react-loader-spinner'
 import LatestMatch from '../LatestMatch'
 import MatchCard from '../MatchCard'
+
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css'
+
 import './index.css'
 
 class TeamMatches extends Component {
   state = {
-    matchesData: [],
+    matchesData: {},
     isLoading: true,
   }
 
@@ -54,45 +57,41 @@ class TeamMatches extends Component {
     this.setState({matchesData: updatedData, isLoading: false})
   }
 
-  renderTeamMatches = () => {
-    const {matchesData} = this.state
-    const {teamBannerUrl, latestMatchDetails} = matchesData
-    return (
-      <div className="team-matches-container">
-        <img src={teamBannerUrl} alt="team banner" className="team-banner" />
-        <LatestMatch latestMatch={latestMatchDetails} />
-        {this.renderRecentMatchsList()}
-      </div>
-    )
-  }
-
-  renderRecentMatchsList = () => {
-    const {matchesData} = this.state
-    const {recentMatches} = matchesData
-    return (
-      <ul className="recent-matches-list">
-        {recentMatches.map(eachMatch => (
-          <MatchCard matchData={eachMatch} key={eachMatch.id} />
-        ))}
-      </ul>
-    )
-  }
-
-  renderLoader = () => (
-    <div data-testid="loader" className="loader-container">
-      <Loader type="BallTriangle" color="#00BFFF" height={80} width={80} />
-    </div>
-  )
-
   render() {
-    const {isLoading} = this.state
+    const {matchesData, isLoading} = this.state
     const {match} = this.props
     const {params} = match
     const {id} = params
+    const {teamBannerUrl, latestMatchDetails, recentMatches} = matchesData
     return (
-      <div className={`app-team-matches-container ${id}`}>
-        {isLoading ? this.renderLoader() : this.renderTeamMatches()}
-      </div>
+      <>
+        <div className={`bg-container ${id}`}>
+          {isLoading && (
+            <div data-testid="loader" className="loader-container">
+              <Loader type="Oval" color="#00BFFF" height={80} width={80} />
+            </div>
+          )}
+          {!isLoading && (
+            <>
+              <img
+                src={teamBannerUrl}
+                className="banner-img"
+                alt="team banner"
+              />
+              <h1 className="latest-name">Latest Matches</h1>
+              <LatestMatch
+                key={latestMatchDetails.id}
+                latestMatch={latestMatchDetails}
+              />
+              <ul className="recent-list">
+                {recentMatches.map(eachValue => (
+                  <MatchCard key={eachValue.id} matchData={eachValue} />
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+      </>
     )
   }
 }
